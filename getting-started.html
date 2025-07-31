@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - DIME Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/jpeg" href="images/6IX-DIME 8.jpg">
+    <link rel="apple-touch-icon" href="images/6IX-DIME 8.jpg">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <img src="images/6IX-DIME 8.jpg" alt="DIME Logo" class="nav-logo">
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="getting-started.html" class="active">Getting Started</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                </ul>
+                <div class="nav-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="features-hero">
+            <div class="container">
+                <h1>Getting Started with DIME</h1>
+                <p>From installation to your first data flow in minutes</p>
+            </div>
+        </section>
+
+        <div class="getting-started-content">
+            <div class="step">
+                <h3>Step 1: Installation</h3>
+                <p>DIME can be installed in multiple ways depending on your environment:</p>
+                
+                <h4>Option A: Windows Service</h4>
+                <div class="code-block">
+                    <pre>DIME.exe install
+DIME.exe start</pre>
+                </div>
+                
+                <h4>Option B: Docker Container</h4>
+                <div class="code-block">
+                    <pre>docker pull mriiot/dime:latest
+docker run -d -p 9999:9999 -p 9998:9998 \
+  -v /path/to/configs:/app/configs \
+  mriiot/dime:latest</pre>
+                </div>
+                
+                <h4>Option C: Direct Execution</h4>
+                <div class="code-block">
+                    <pre>dotnet run --project DIME/DIME.csproj -- --config /path/to/configs</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 2: Basic Configuration</h3>
+                <p>Create your first configuration file to connect to industrial devices. DIME uses YAML files for configuration:</p>
+                
+                <h4>Example: Connect to an OPC-UA Server</h4>
+                <div class="code-block">
+                    <pre>app:
+  admin:
+    enabled: true
+    httpPort: 9999
+    wsPort: 9998
+
+sources:
+  - name: myOpcServer
+    connector: OpcUaSource
+    scanInterval: 1000
+    settings:
+      endpointUrl: opc.tcp://localhost:4840
+      userName: admin
+      password: password
+    items:
+      - name: temperature
+        path: ns=2;s=Machine.Temperature
+      - name: pressure
+        path: ns=2;s=Machine.Pressure
+
+sinks:
+  - name: dashboard
+    connector: WebSocketSink
+    includeFilter:
+      - "**"</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 3: Connect to Multiple Devices</h3>
+                <p>DIME can connect to multiple devices and protocols simultaneously:</p>
+                
+                <div class="code-block">
+                    <pre>sources:
+  # Modbus TCP Device
+  - name: plc1
+    connector: ModbusTcpSource
+    scanInterval: 500
+    settings:
+      ipAddress: 192.168.1.100
+      port: 502
+    items:
+      - name: coil_status
+        address: 00001
+        dataType: bool
+      - name: register_value
+        address: 40001
+        dataType: uint16
+
+  # MQTT Broker
+  - name: mqttBroker
+    connector: MqttSource
+    settings:
+      brokerAddress: mqtt://broker.hivemq.com
+      topics:
+        - sensors/+/temperature
+        - sensors/+/humidity
+
+  # SQL Database
+  - name: productionDb
+    connector: SqlServerSource
+    scanInterval: 5000
+    settings:
+      connectionString: "Server=localhost;Database=Production;Trusted_Connection=true;"
+      query: "SELECT * FROM CurrentProduction WHERE UpdateTime > @LastPoll"</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 4: Data Transformation</h3>
+                <p>Transform your data on-the-fly using built-in scripting engines:</p>
+                
+                <h4>Lua Script Example</h4>
+                <div class="code-block">
+                    <pre>sinks:
+  - name: processedData
+    connector: InfluxDbSink
+    settings:
+      url: http://localhost:8086
+      database: production
+    transform:
+      engine: lua
+      script: |
+        -- Convert Celsius to Fahrenheit
+        if msg.path:match("temperature") then
+          msg.value = msg.value * 9/5 + 32
+          msg.unit = "°F"
+        end
+        return msg</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 5: Access the Web Portal</h3>
+                <p>Once DIME is running, access the web management portal:</p>
+                
+                <ol>
+                    <li>Open your browser and navigate to <code>http://localhost:9999</code></li>
+                    <li>You'll see the DIME dashboard with real-time connector status</li>
+                    <li>Click on "Data Explorer" to browse and visualize your data</li>
+                    <li>Use "Configuration" to modify settings through the web interface</li>
+                </ol>
+                
+                <p>The web portal provides:</p>
+                <ul class="feature-list">
+                    <li>Real-time connector monitoring</li>
+                    <li>Interactive data visualization</li>
+                    <li>Configuration management</li>
+                    <li>System health metrics</li>
+                    <li>Message flow timeline</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <h3>Step 6: Advanced Features</h3>
+                <p>Explore DIME's advanced capabilities:</p>
+                
+                <h4>Report by Exception (RBE)</h4>
+                <div class="code-block">
+                    <pre>items:
+  - name: temperature
+    path: ns=2;s=Machine.Temperature
+    rbe:
+      enabled: true
+      deadband: 0.5  # Only report if change > 0.5
+      heartbeat: 60000  # Send value every 60 seconds regardless</pre>
+                </div>
+                
+                <h4>Multiple Configuration Files</h4>
+                <p>Split your configuration across multiple files for better organization:</p>
+                <div class="code-block">
+                    <pre># configs/sources/plc.yaml
+sources:
+  - name: mainPLC
+    connector: EthernetIpSource
+    # ... configuration
+
+# configs/sinks/database.yaml
+sinks:
+  - name: historian
+    connector: PostgreSqlSink
+    # ... configuration
+
+# configs/main.yaml
+app:
+  admin:
+    enabled: true</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Next Steps</h3>
+                <p>Now that you have DIME up and running:</p>
+                
+                <ul class="feature-list">
+                    <li>Explore the <a href="gallery.html">Gallery</a> to see DIME in action</li>
+                    <li>Review all available <a href="features.html">Features</a></li>
+                    <li>Join our community forum for support and best practices</li>
+                    <li>Check out example configurations on GitHub</li>
+                    <li>Contact us for enterprise support options</li>
+                </ul>
+            </div>
+        </div>
+
+        <section class="cta">
+            <div class="container">
+                <h2>Need Help Getting Started?</h2>
+                <p>Our team is here to help you succeed with DIME</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary">Contact Support</a>
+                    <a href="gallery.html" class="btn btn-secondary">View Examples</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DIME Platform</h4>
+                    <ul>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="getting-started.html">Documentation</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">GitHub Repository</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About MRIIOT</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Partners</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 MRIIOT LLC. All rights reserved. | DIME - Data In Motion Enterprise</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

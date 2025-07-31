@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Guide - DIME Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/jpeg" href="images/6IX-DIME 8.jpg">
+    <link rel="apple-touch-icon" href="images/6IX-DIME 8.jpg">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <img src="images/6IX-DIME 8.jpg" alt="DIME Logo" class="nav-logo">
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="getting-started.html">Getting Started</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li class="nav-dropdown">
+                        <a href="documentation.html" class="active">Documentation</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="docs-connectors.html">Connector Reference</a></li>
+                            <li><a href="docs-configuration.html" class="active">Configuration Guide</a></li>
+                            <li><a href="docs-api.html">API Reference</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="nav-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="docs-hero">
+            <div class="container">
+                <nav class="breadcrumb">
+                    <a href="documentation.html">Documentation</a> > <span>Configuration Guide</span>
+                </nav>
+                <h1>Configuration Guide</h1>
+                <p class="lead">Learn how to configure DIME using YAML files and the web interface for your specific requirements.</p>
+            </div>
+        </section>
+
+        <section class="config-intro">
+            <div class="container">
+                <div class="config-overview">
+                    <h2>Configuration Overview</h2>
+                    <p>DIME offers two powerful ways to configure your industrial data integration:</p>
+                    <div class="config-methods">
+                        <div class="method-card">
+                            <h3>📝 YAML Configuration</h3>
+                            <p>Infrastructure-as-code approach using human-readable YAML files. Perfect for version control, automation, and complex deployments.</p>
+                            <ul>
+                                <li>Version control friendly</li>
+                                <li>AI-configurable</li>
+                                <li>Modular and reusable</li>
+                                <li>Template support</li>
+                            </ul>
+                        </div>
+                        <div class="method-card">
+                            <h3>🖥️ Web Interface</h3>
+                            <p>Intuitive graphical interface for real-time configuration and monitoring. Ideal for operations teams and quick adjustments.</p>
+                            <ul>
+                                <li>Visual configuration</li>
+                                <li>Real-time validation</li>
+                                <li>Drag-and-drop interface</li>
+                                <li>Instant preview</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="yaml" class="yaml-section">
+            <div class="container">
+                <h2>YAML Configuration</h2>
+                
+                <div class="yaml-basics">
+                    <h3>Configuration Structure</h3>
+                    <p>DIME configurations are organized into three main sections:</p>
+                    
+                    <div class="code-example">
+                        <pre><code># main.yaml - Primary configuration file
+app:
+  license: YOUR-LICENSE-KEY
+  ring_buffer: 4096
+  http_server_uri: http://127.0.0.1:9999/
+  ws_server_uri: ws://127.0.0.1:9998/
+
+sources:
+  - name: plc_data
+    connector: ModbusTCP
+    # Source configuration...
+
+sinks:
+  - name: database
+    connector: PostgreSQL
+    # Sink configuration...</code></pre>
+                    </div>
+                </div>
+
+                <div class="yaml-advanced">
+                    <h3>Modular Configuration</h3>
+                    <p>Split configurations across multiple files using YAML anchors for better organization:</p>
+                    
+                    <div class="code-example">
+                        <pre><code># plc.yaml - PLC connector definitions
+plc1: &plc1
+  name: production_plc
+  connector: EthernetIP
+  address: 192.168.1.100
+  items:
+    - name: temperature
+      address: Temperature_Tag
+      type: float
+    - name: pressure
+      address: Pressure_Tag
+      type: float
+
+# database.yaml - Database sink definition
+postgres: &postgres
+  name: timeseries_db
+  connector: PostgreSQL
+  connection_string: "Host=localhost;Database=dime;Username=user;Password=pass"
+  table_name: sensor_data
+
+# main.yaml - Reference the modular configurations
+sources:
+  - *plc1
+
+sinks:
+  - *postgres</code></pre>
+                    </div>
+                </div>
+
+                <div class="yaml-items">
+                    <h3>Configuring Data Items</h3>
+                    <p>Define individual data points with addresses, types, and transformation scripts:</p>
+                    
+                    <div class="code-example">
+                        <pre><code>items:
+  - name: temperature_celsius
+    address: 40001
+    type: float
+    rbe: true  # Report by exception
+    every: 5   # Read every 5 scan intervals
+    script: |
+      -- Convert Fahrenheit to Celsius
+      return (result - 32) * 5/9
+    sink:
+      mtconnect: Device[name=machine1]/Controller/Temperature[category=Sample]</code></pre>
+                    </div>
+                </div>
+
+                <div class="yaml-scripting">
+                    <h3>Data Transformation with Scripting</h3>
+                    <p>Use Lua or Python scripts for complex data transformations:</p>
+                    
+                    <div class="code-example">
+                        <pre><code>- name: opc_source
+  connector: OpcUa
+  lang_script: Lua  # or Python
+  init_script: |
+    -- Initialize libraries and variables
+    json = require('json')
+    alarm_threshold = 100
+    
+  item_script: |
+    -- Process each item
+    if result > alarm_threshold then
+      emit('./alarm', 'HIGH_TEMPERATURE')
+    end
+    return result * 1.5  -- Scale value
+    
+  items:
+    - name: sensor1
+      node_id: ns=2;s=Sensor1
+      script: |
+        -- Item-specific processing
+        local scaled = result / 100
+        return string.format("%.2f", scaled)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="web-ui" class="webui-section">
+            <div class="container">
+                <h2>Web Interface Configuration</h2>
+                
+                <div class="webui-features">
+                    <h3>Visual Configuration Management</h3>
+                    <img src="images/advanced_connector_configuration_1.png" alt="Web Configuration Interface" class="doc-screenshot">
+                    <p>The web interface provides an intuitive way to configure connectors with real-time validation and visual feedback.</p>
+                    
+                    <h4>Key Features:</h4>
+                    <ul>
+                        <li><strong>Connector Management:</strong> Add, edit, and remove connectors through the GUI</li>
+                        <li><strong>Item Configuration:</strong> Define data items with point-and-click interface</li>
+                        <li><strong>Real-time Validation:</strong> Immediate feedback on configuration errors</li>
+                        <li><strong>Test Connections:</strong> Verify connectivity before deploying</li>
+                    </ul>
+                </div>
+
+                <div class="webui-monitoring">
+                    <h3>Real-time Monitoring</h3>
+                    <img src="images/advanced_monitoring_1.png" alt="Real-time Monitoring Dashboard" class="doc-screenshot">
+                    <p>Monitor data flows, connector health, and system performance in real-time.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="scripting" class="scripting-section">
+            <div class="container">
+                <h2>Scripting and Transformations</h2>
+                
+                <div class="scripting-overview">
+                    <h3>Supported Languages</h3>
+                    <div class="language-cards">
+                        <div class="lang-card">
+                            <h4>🌙 Lua</h4>
+                            <p>Lightweight and fast scripting language, perfect for real-time data transformations.</p>
+                            <ul>
+                                <li>Minimal memory footprint</li>
+                                <li>Excellent performance</li>
+                                <li>Built-in libraries included</li>
+                            </ul>
+                        </div>
+                        <div class="lang-card">
+                            <h4>🐍 Python</h4>
+                            <p>Powerful scripting with access to extensive libraries for complex calculations.</p>
+                            <ul>
+                                <li>Rich ecosystem</li>
+                                <li>Scientific computing</li>
+                                <li>Machine learning integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scripting-functions">
+                    <h3>Available Functions</h3>
+                    <table class="function-table">
+                        <thead>
+                            <tr>
+                                <th>Function</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>cache(path, default)</code></td>
+                                <td>Retrieve value from cache</td>
+                                <td><code>local temp = cache("plc1/temperature", 0)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>emit(path, value)</code></td>
+                                <td>Create new data sample</td>
+                                <td><code>emit("./alarm", "HIGH_TEMP")</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>set(key, value)</code></td>
+                                <td>Store value in user cache</td>
+                                <td><code>set("last_value", result)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>env(name, default)</code></td>
+                                <td>Get environment variable</td>
+                                <td><code>local threshold = env("ALARM_THRESHOLD", 100)</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="scripting-examples">
+                    <h3>Common Scripting Patterns</h3>
+                    
+                    <h4>Data Aggregation</h4>
+                    <pre><code>-- Calculate average of multiple sensors
+local sum = 0
+local count = 0
+for i = 1, 5 do
+  local val = cache(string.format("sensor%d/value", i), 0)
+  sum = sum + val
+  count = count + 1
+end
+return sum / count</code></pre>
+
+                    <h4>Threshold Alerting</h4>
+                    <pre><code>-- Generate alerts based on thresholds
+if result > 100 then
+  emit("./alert", "HIGH")
+  emit("./alert_message", "Temperature exceeds limit: " .. result)
+elseif result < 20 then
+  emit("./alert", "LOW")
+  emit("./alert_message", "Temperature below minimum: " .. result)
+else
+  emit("./alert", "NORMAL")
+end
+return result</code></pre>
+
+                    <h4>Data Transformation</h4>
+                    <pre><code>-- Parse complex data structures
+local json = require('json')
+local data = json.decode(result)
+
+-- Extract specific fields
+emit("./temperature", data.sensors.temperature)
+emit("./pressure", data.sensors.pressure)
+emit("./status", data.machine.status)
+
+-- Calculate derived values
+local efficiency = (data.output / data.input) * 100
+emit("./efficiency", efficiency)
+
+return nil  -- Don't emit original message</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="best-practices" class="best-practices">
+            <div class="container">
+                <h2>Configuration Best Practices</h2>
+                
+                <div class="practice-grid">
+                    <div class="practice-card">
+                        <h3>🏗️ Structure & Organization</h3>
+                        <ul>
+                            <li>Use separate YAML files for different connector types</li>
+                            <li>Group related connectors together</li>
+                            <li>Use meaningful, descriptive names</li>
+                            <li>Document complex configurations with comments</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="practice-card">
+                        <h3>🔒 Security</h3>
+                        <ul>
+                            <li>Store credentials in environment variables</li>
+                            <li>Use encrypted connections when available</li>
+                            <li>Implement least-privilege access</li>
+                            <li>Regular security audits of configurations</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="practice-card">
+                        <h3>⚡ Performance</h3>
+                        <ul>
+                            <li>Optimize scan intervals for data requirements</li>
+                            <li>Use Report By Exception (RBE) to reduce data volume</li>
+                            <li>Batch database writes for efficiency</li>
+                            <li>Monitor connector execution times</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="practice-card">
+                        <h3>🔧 Maintenance</h3>
+                        <ul>
+                            <li>Version control all configuration files</li>
+                            <li>Test configurations in staging environment</li>
+                            <li>Document custom scripts and transformations</li>
+                            <li>Regular backup of configurations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="config-templates">
+            <div class="container">
+                <h2>Configuration Templates</h2>
+                <p>Download ready-to-use configuration templates for common scenarios:</p>
+                
+                <div class="template-grid">
+                    <div class="template-card">
+                        <h3>📊 OPC-UA to Database</h3>
+                        <p>Connect OPC-UA server to PostgreSQL with data transformation.</p>
+                        <a href="#" class="btn btn-secondary">Download Template</a>
+                    </div>
+                    <div class="template-card">
+                        <h3>🏭 PLC Monitoring</h3>
+                        <p>Monitor multiple PLCs and send data to cloud services.</p>
+                        <a href="#" class="btn btn-secondary">Download Template</a>
+                    </div>
+                    <div class="template-card">
+                        <h3>📈 MTConnect Integration</h3>
+                        <p>Complete MTConnect agent setup with analytics.</p>
+                        <a href="#" class="btn btn-secondary">Download Template</a>
+                    </div>
+                    <div class="template-card">
+                        <h3>☁️ Cloud Analytics</h3>
+                        <p>Stream data to multiple cloud platforms simultaneously.</p>
+                        <a href="#" class="btn btn-secondary">Download Template</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DIME Platform</h4>
+                    <ul>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="documentation.html">Documentation</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="docs-connectors.html">Connector Reference</a></li>
+                        <li><a href="docs-configuration.html">Configuration Guide</a></li>
+                        <li><a href="docs-api.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">GitHub Repository</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About MRIIOT</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Partners</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 MRIIOT LLC. All rights reserved. | DIME - Data In Motion Enterprise</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

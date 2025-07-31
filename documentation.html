@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - DIME Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/jpeg" href="images/6IX-DIME 8.jpg">
+    <link rel="apple-touch-icon" href="images/6IX-DIME 8.jpg">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <img src="images/6IX-DIME 8.jpg" alt="DIME Logo" class="nav-logo">
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="getting-started.html">Getting Started</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li class="nav-dropdown">
+                        <a href="documentation.html" class="active">Documentation</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="docs-connectors.html">Connector Reference</a></li>
+                            <li><a href="docs-configuration.html">Configuration Guide</a></li>
+                            <li><a href="docs-api.html">API Reference</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="nav-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="docs-hero">
+            <div class="container">
+                <h1>DIME Documentation</h1>
+                <p class="lead">Everything you need to know about deploying, configuring, and extending the DIME platform.</p>
+            </div>
+        </section>
+
+        <section class="docs-overview">
+            <div class="container">
+                <div class="docs-grid">
+                    <div class="docs-card">
+                        <div class="docs-card-icon">📚</div>
+                        <h2>Getting Started</h2>
+                        <p>New to DIME? Start here with our comprehensive installation and setup guides.</p>
+                        <ul>
+                            <li><a href="getting-started.html">Quick Start Guide</a></li>
+                            <li><a href="#installation">Installation</a></li>
+                            <li><a href="#first-connector">Your First Connector</a></li>
+                            <li><a href="#basic-config">Basic Configuration</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="docs-card">
+                        <div class="docs-card-icon">🔌</div>
+                        <h2>Connector Reference</h2>
+                        <p>Detailed documentation for all 40+ industrial and enterprise connectors.</p>
+                        <ul>
+                            <li><a href="docs-connectors.html#industrial">Industrial Protocols</a></li>
+                            <li><a href="docs-connectors.html#enterprise">Enterprise Systems</a></li>
+                            <li><a href="docs-connectors.html#cloud">Cloud Services</a></li>
+                            <li><a href="docs-connectors.html#custom">Custom Connectors</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="docs-card">
+                        <div class="docs-card-icon">⚙️</div>
+                        <h2>Configuration Guide</h2>
+                        <p>Learn how to configure DIME for your specific requirements using YAML and the web interface.</p>
+                        <ul>
+                            <li><a href="docs-configuration.html#yaml">YAML Configuration</a></li>
+                            <li><a href="docs-configuration.html#web-ui">Web Interface</a></li>
+                            <li><a href="docs-configuration.html#scripting">Scripting & Transformations</a></li>
+                            <li><a href="docs-configuration.html#best-practices">Best Practices</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="docs-card">
+                        <div class="docs-card-icon">🔧</div>
+                        <h2>API Reference</h2>
+                        <p>Integrate DIME with your applications using our comprehensive REST APIs.</p>
+                        <ul>
+                            <li><a href="docs-api.html#rest">REST API</a></li>
+                            <li><a href="docs-api.html#websocket">WebSocket API</a></li>
+                            <li><a href="docs-api.html#management">Management API</a></li>
+                            <li><a href="docs-api.html#examples">Code Examples</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="docs-card">
+                        <div class="docs-card-icon">🧠</div>
+                        <h2>Advanced Topics</h2>
+                        <p>Deep dive into advanced features including HTM AI, performance tuning, and scaling.</p>
+                        <ul>
+                            <li><a href="#htm">Hierarchical Temporal Memory</a></li>
+                            <li><a href="#performance">Performance Optimization</a></li>
+                            <li><a href="#scaling">Scaling DIME</a></li>
+                            <li><a href="#security">Security Best Practices</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="docs-card">
+                        <div class="docs-card-icon">💡</div>
+                        <h2>Examples & Tutorials</h2>
+                        <p>Real-world examples and step-by-step tutorials for common use cases.</p>
+                        <ul>
+                            <li><a href="#plc-monitoring">PLC Monitoring Setup</a></li>
+                            <li><a href="#mtconnect">MTConnect Integration</a></li>
+                            <li><a href="#cloud-sync">Cloud Data Sync</a></li>
+                            <li><a href="#predictive">Predictive Maintenance</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="docs-quick-links">
+            <div class="container">
+                <h2>Popular Topics</h2>
+                <div class="quick-links-grid">
+                    <a href="#docker" class="quick-link">
+                        <span class="quick-link-icon">🐳</span>
+                        <span>Docker Deployment</span>
+                    </a>
+                    <a href="#windows-service" class="quick-link">
+                        <span class="quick-link-icon">🪟</span>
+                        <span>Windows Service</span>
+                    </a>
+                    <a href="#opc-ua" class="quick-link">
+                        <span class="quick-link-icon">🏭</span>
+                        <span>OPC-UA Setup</span>
+                    </a>
+                    <a href="#mqtt" class="quick-link">
+                        <span class="quick-link-icon">📡</span>
+                        <span>MQTT Configuration</span>
+                    </a>
+                    <a href="#scripting" class="quick-link">
+                        <span class="quick-link-icon">📝</span>
+                        <span>Lua Scripting</span>
+                    </a>
+                    <a href="#monitoring" class="quick-link">
+                        <span class="quick-link-icon">📊</span>
+                        <span>System Monitoring</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="docs-resources">
+            <div class="container">
+                <h2>Additional Resources</h2>
+                <div class="resources-grid">
+                    <div class="resource-card">
+                        <h3>📖 Field Manual</h3>
+                        <p>Comprehensive guide to DIME deployment and operations in industrial environments.</p>
+                        <a href="#" class="btn btn-secondary">Download PDF</a>
+                    </div>
+                    <div class="resource-card">
+                        <h3>🎥 Video Tutorials</h3>
+                        <p>Watch step-by-step video guides for common DIME configurations and use cases.</p>
+                        <a href="#" class="btn btn-secondary">View Videos</a>
+                    </div>
+                    <div class="resource-card">
+                        <h3>💬 Community Forum</h3>
+                        <p>Join the DIME community to ask questions, share experiences, and get support.</p>
+                        <a href="#" class="btn btn-secondary">Visit Forum</a>
+                    </div>
+                    <div class="resource-card">
+                        <h3>🔄 Release Notes</h3>
+                        <p>Stay up to date with the latest features, improvements, and bug fixes.</p>
+                        <a href="#" class="btn btn-secondary">View Releases</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="docs-search">
+            <div class="container">
+                <h2>Can't find what you're looking for?</h2>
+                <div class="search-box">
+                    <input type="text" placeholder="Search documentation..." class="search-input">
+                    <button class="search-button">Search</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DIME Platform</h4>
+                    <ul>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="documentation.html">Documentation</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="docs-connectors.html">Connector Reference</a></li>
+                        <li><a href="docs-configuration.html">Configuration Guide</a></li>
+                        <li><a href="docs-api.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">GitHub Repository</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About MRIIOT</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Partners</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 MRIIOT LLC. All rights reserved. | DIME - Data In Motion Enterprise</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

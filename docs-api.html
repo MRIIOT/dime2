@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - DIME Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/jpeg" href="images/6IX-DIME 8.jpg">
+    <link rel="apple-touch-icon" href="images/6IX-DIME 8.jpg">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <img src="images/6IX-DIME 8.jpg" alt="DIME Logo" class="nav-logo">
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="getting-started.html">Getting Started</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li class="nav-dropdown">
+                        <a href="documentation.html" class="active">Documentation</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="docs-connectors.html">Connector Reference</a></li>
+                            <li><a href="docs-configuration.html">Configuration Guide</a></li>
+                            <li><a href="docs-api.html" class="active">API Reference</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="nav-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="docs-hero">
+            <div class="container">
+                <nav class="breadcrumb">
+                    <a href="documentation.html">Documentation</a> > <span>API Reference</span>
+                </nav>
+                <h1>API Reference</h1>
+                <p class="lead">Complete reference for DIME's REST and WebSocket APIs for integration and management.</p>
+            </div>
+        </section>
+
+        <section class="api-overview">
+            <div class="container">
+                <div class="api-intro">
+                    <h2>API Overview</h2>
+                    <p>DIME provides comprehensive APIs for system integration, monitoring, and management:</p>
+                    
+                    <div class="api-types">
+                        <div class="api-card">
+                            <h3>🌐 REST API</h3>
+                            <p>HTTP-based API for configuration management, status monitoring, and control operations.</p>
+                            <code>Base URL: http://localhost:9999</code>
+                        </div>
+                        <div class="api-card">
+                            <h3>🔌 WebSocket API</h3>
+                            <p>Real-time streaming API for live data feeds and system events.</p>
+                            <code>WebSocket URL: ws://localhost:9998</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rest" class="rest-api">
+            <div class="container">
+                <h2>REST API Reference</h2>
+                
+                <div class="api-section">
+                    <h3>System Status</h3>
+                    
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code class="endpoint-path">/status</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Returns comprehensive system status including all connectors and their current state.</p>
+                            
+                            <h4>Response Example:</h4>
+                            <pre><code>{
+  "system": {
+    "version": "6.0.0",
+    "uptime": 3600,
+    "status": "running"
+  },
+  "connectors": [
+    {
+      "name": "plc1",
+      "type": "ModbusTCP",
+      "status": "connected",
+      "messageCount": 15420,
+      "lastUpdate": "2025-01-15T10:30:00Z",
+      "faultCount": 0
+    }
+  ],
+  "performance": {
+    "messagesPerSecond": 1250,
+    "cpuUsage": 15.2,
+    "memoryUsage": 256
+  }
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code class="endpoint-path">/status/connectors</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Returns detailed status information for all connectors.</p>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code class="endpoint-path">/status/connector/{name}</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Returns detailed status for a specific connector.</p>
+                            
+                            <h4>Parameters:</h4>
+                            <ul>
+                                <li><code>name</code> - Connector name (path parameter)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <h3>Configuration Management</h3>
+                    
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code class="endpoint-path">/config/yaml</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Returns the current running configuration in YAML format.</p>
+                            
+                            <h4>Response Example:</h4>
+                            <pre><code>app:
+  license: XXXX-XXXX-XXXX-XXXX
+  ring_buffer: 4096
+  http_server_uri: http://127.0.0.1:9999/
+  
+sources:
+  - name: plc1
+    connector: ModbusTCP
+    address: 192.168.1.100
+    # ... additional configuration</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <code class="endpoint-path">/config/yaml</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Upload a new configuration. Requires service restart to take effect.</p>
+                            
+                            <h4>Request Body:</h4>
+                            <pre><code>Content-Type: text/yaml
+
+app:
+  license: YOUR-LICENSE-KEY
+  # ... complete YAML configuration</code></pre>
+                            
+                            <h4>Response:</h4>
+                            <pre><code>{
+  "status": "success",
+  "message": "Configuration uploaded. Restart required."
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code class="endpoint-path">/config/validate</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Validates the current configuration without applying changes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <h3>Service Control</h3>
+                    
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <code class="endpoint-path">/service/restart</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Restarts the DIME service to apply configuration changes.</p>
+                            
+                            <h4>Response:</h4>
+                            <pre><code>{
+  "status": "restarting",
+  "message": "Service restart initiated"
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <code class="endpoint-path">/collectors/start/{name}</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Starts a specific connector.</p>
+                            
+                            <h4>Parameters:</h4>
+                            <ul>
+                                <li><code>name</code> - Connector name to start</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <code class="endpoint-path">/collectors/stop/{name}</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Stops a specific connector.</p>
+                            
+                            <h4>Parameters:</h4>
+                            <ul>
+                                <li><code>name</code> - Connector name to stop</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <h3>Data Access</h3>
+                    
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code class="endpoint-path">/data/current</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Returns current values for all data items.</p>
+                            
+                            <h4>Query Parameters:</h4>
+                            <ul>
+                                <li><code>filter</code> - Regex pattern to filter items</li>
+                                <li><code>format</code> - Response format (json, csv)</li>
+                            </ul>
+                            
+                            <h4>Response Example:</h4>
+                            <pre><code>{
+  "timestamp": "2025-01-15T10:30:00Z",
+  "items": {
+    "plc1/temperature": {
+      "value": 72.5,
+      "timestamp": "2025-01-15T10:29:55Z",
+      "quality": "good"
+    },
+    "plc1/pressure": {
+      "value": 101.3,
+      "timestamp": "2025-01-15T10:29:55Z",
+      "quality": "good"
+    }
+  }
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <code class="endpoint-path">/data/history</code>
+                        </div>
+                        <div class="endpoint-body">
+                            <p>Returns historical data for specified items and time range.</p>
+                            
+                            <h4>Query Parameters:</h4>
+                            <ul>
+                                <li><code>items</code> - Comma-separated list of item paths</li>
+                                <li><code>start</code> - Start timestamp (ISO 8601)</li>
+                                <li><code>end</code> - End timestamp (ISO 8601)</li>
+                                <li><code>limit</code> - Maximum number of results</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="websocket" class="websocket-api">
+            <div class="container">
+                <h2>WebSocket API Reference</h2>
+                
+                <div class="ws-intro">
+                    <p>The WebSocket API provides real-time streaming of system events and data updates.</p>
+                    
+                    <h3>Connection</h3>
+                    <pre><code>const ws = new WebSocket('ws://localhost:9998');
+
+ws.onopen = function() {
+    console.log('Connected to DIME WebSocket');
+    
+    // Subscribe to specific data items
+    ws.send(JSON.stringify({
+        action: 'subscribe',
+        items: ['plc1/temperature', 'plc1/pressure']
+    }));
+};
+
+ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    console.log('Received:', data);
+};</code></pre>
+                </div>
+
+                <div class="ws-messages">
+                    <h3>Message Types</h3>
+                    
+                    <div class="message-type">
+                        <h4>Data Update</h4>
+                        <p>Real-time data value updates from connectors.</p>
+                        <pre><code>{
+  "type": "data",
+  "timestamp": "2025-01-15T10:30:00Z",
+  "item": "plc1/temperature",
+  "value": 72.5,
+  "quality": "good"
+}</code></pre>
+                    </div>
+
+                    <div class="message-type">
+                        <h4>System Event</h4>
+                        <p>System-level events like connector status changes.</p>
+                        <pre><code>{
+  "type": "event",
+  "timestamp": "2025-01-15T10:30:00Z",
+  "event": "connector_connected",
+  "connector": "plc1",
+  "details": {
+    "address": "192.168.1.100",
+    "protocol": "ModbusTCP"
+  }
+}</code></pre>
+                    </div>
+
+                    <div class="message-type">
+                        <h4>Performance Metrics</h4>
+                        <p>Real-time performance statistics.</p>
+                        <pre><code>{
+  "type": "metrics",
+  "timestamp": "2025-01-15T10:30:00Z",
+  "metrics": {
+    "messagesPerSecond": 1250,
+    "activeConnectors": 5,
+    "cpuUsage": 15.2,
+    "memoryUsage": 256
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="ws-commands">
+                    <h3>WebSocket Commands</h3>
+                    
+                    <table class="command-table">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>subscribe</code></td>
+                                <td>Subscribe to specific data items</td>
+                                <td><code>{"action": "subscribe", "items": ["plc1/*"]}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>unsubscribe</code></td>
+                                <td>Unsubscribe from data items</td>
+                                <td><code>{"action": "unsubscribe", "items": ["plc1/temp"]}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>list</code></td>
+                                <td>List all available data items</td>
+                                <td><code>{"action": "list"}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>ping</code></td>
+                                <td>Keep connection alive</td>
+                                <td><code>{"action": "ping"}</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="management" class="management-api">
+            <div class="container">
+                <h2>Management API</h2>
+                
+                <div class="mgmt-section">
+                    <h3>Authentication</h3>
+                    <p>When authentication is enabled, include the API key in request headers:</p>
+                    <pre><code>Authorization: Bearer YOUR-API-KEY</code></pre>
+                </div>
+
+                <div class="mgmt-section">
+                    <h3>Error Responses</h3>
+                    <p>All API errors follow a consistent format:</p>
+                    <pre><code>{
+  "error": {
+    "code": "CONNECTOR_NOT_FOUND",
+    "message": "Connector 'plc1' not found",
+    "details": {
+      "connector": "plc1",
+      "availableConnectors": ["plc2", "mqtt1", "db1"]
+    }
+  }
+}</code></pre>
+                    
+                    <h4>Common Error Codes:</h4>
+                    <ul>
+                        <li><code>INVALID_CONFIGURATION</code> - Configuration validation failed</li>
+                        <li><code>CONNECTOR_NOT_FOUND</code> - Specified connector doesn't exist</li>
+                        <li><code>UNAUTHORIZED</code> - Missing or invalid authentication</li>
+                        <li><code>SERVICE_UNAVAILABLE</code> - Service is restarting or shutting down</li>
+                    </ul>
+                </div>
+
+                <div class="mgmt-section">
+                    <h3>Rate Limiting</h3>
+                    <p>API requests are rate-limited to prevent abuse:</p>
+                    <ul>
+                        <li>Status endpoints: 60 requests per minute</li>
+                        <li>Configuration endpoints: 10 requests per minute</li>
+                        <li>Control endpoints: 30 requests per minute</li>
+                    </ul>
+                    <p>Rate limit headers are included in responses:</p>
+                    <pre><code>X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1642248000</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="code-examples">
+            <div class="container">
+                <h2>Code Examples</h2>
+                
+                <div class="example-tabs">
+                    <button class="example-tab active" onclick="showExample('python')">Python</button>
+                    <button class="example-tab" onclick="showExample('javascript')">JavaScript</button>
+                    <button class="example-tab" onclick="showExample('csharp')">C#</button>
+                    <button class="example-tab" onclick="showExample('curl')">cURL</button>
+                </div>
+
+                <div id="python-example" class="example-content active">
+                    <h3>Python Example</h3>
+                    <pre><code>import requests
+import json
+import websocket
+
+# REST API Example
+base_url = "http://localhost:9999"
+
+# Get system status
+response = requests.get(f"{base_url}/status")
+status = response.json()
+print(f"System Status: {status['system']['status']}")
+
+# Upload configuration
+with open('config.yaml', 'r') as f:
+    config_yaml = f.read()
+    
+response = requests.post(
+    f"{base_url}/config/yaml",
+    data=config_yaml,
+    headers={'Content-Type': 'text/yaml'}
+)
+
+# WebSocket Example
+def on_message(ws, message):
+    data = json.loads(message)
+    print(f"Received: {data}")
+
+def on_open(ws):
+    # Subscribe to all PLC data
+    ws.send(json.dumps({
+        "action": "subscribe",
+        "items": ["plc1/*"]
+    }))
+
+ws = websocket.WebSocketApp(
+    "ws://localhost:9998",
+    on_open=on_open,
+    on_message=on_message
+)
+ws.run_forever()</code></pre>
+                </div>
+
+                <div id="javascript-example" class="example-content">
+                    <h3>JavaScript Example</h3>
+                    <pre><code>// REST API Example
+const baseUrl = 'http://localhost:9999';
+
+// Get system status
+fetch(`${baseUrl}/status`)
+    .then(response => response.json())
+    .then(data => {
+        console.log('System Status:', data.system.status);
+        console.log('Active Connectors:', data.connectors.length);
+    });
+
+// Start a connector
+fetch(`${baseUrl}/collectors/start/plc1`, {
+    method: 'POST'
+})
+.then(response => response.json())
+.then(data => console.log('Connector started:', data));
+
+// WebSocket Example
+const ws = new WebSocket('ws://localhost:9998');
+
+ws.onopen = () => {
+    console.log('Connected to DIME WebSocket');
+    
+    // Subscribe to temperature and pressure
+    ws.send(JSON.stringify({
+        action: 'subscribe',
+        items: ['plc1/temperature', 'plc1/pressure']
+    }));
+};
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    
+    if (data.type === 'data') {
+        console.log(`${data.item}: ${data.value}`);
+    }
+};</code></pre>
+                </div>
+
+                <div id="csharp-example" class="example-content">
+                    <h3>C# Example</h3>
+                    <pre><code>using System;
+using System.Net.Http;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+public class DimeApiClient
+{
+    private readonly HttpClient httpClient;
+    private readonly string baseUrl = "http://localhost:9999";
+    
+    public DimeApiClient()
+    {
+        httpClient = new HttpClient();
+    }
+    
+    // Get system status
+    public async Task<SystemStatus> GetStatusAsync()
+    {
+        var response = await httpClient.GetAsync($"{baseUrl}/status");
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<SystemStatus>(json);
+    }
+    
+    // WebSocket connection
+    public async Task ConnectWebSocketAsync()
+    {
+        using var ws = new ClientWebSocket();
+        await ws.ConnectAsync(new Uri("ws://localhost:9998"), CancellationToken.None);
+        
+        // Subscribe to data
+        var subscribeMsg = JsonConvert.SerializeObject(new {
+            action = "subscribe",
+            items = new[] { "plc1/*" }
+        });
+        
+        await ws.SendAsync(
+            new ArraySegment<byte>(Encoding.UTF8.GetBytes(subscribeMsg)),
+            WebSocketMessageType.Text,
+            true,
+            CancellationToken.None
+        );
+        
+        // Receive messages
+        var buffer = new ArraySegment<byte>(new byte[4096]);
+        while (ws.State == WebSocketState.Open)
+        {
+            var result = await ws.ReceiveAsync(buffer, CancellationToken.None);
+            if (result.MessageType == WebSocketMessageType.Text)
+            {
+                var message = Encoding.UTF8.GetString(buffer.Array, 0, result.Count);
+                Console.WriteLine($"Received: {message}");
+            }
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div id="curl-example" class="example-content">
+                    <h3>cURL Examples</h3>
+                    <pre><code># Get system status
+curl -X GET http://localhost:9999/status
+
+# Get current configuration
+curl -X GET http://localhost:9999/config/yaml
+
+# Upload new configuration
+curl -X POST http://localhost:9999/config/yaml \
+  -H "Content-Type: text/yaml" \
+  --data-binary @config.yaml
+
+# Start a connector
+curl -X POST http://localhost:9999/collectors/start/plc1
+
+# Stop a connector
+curl -X POST http://localhost:9999/collectors/stop/plc1
+
+# Get current data values with filter
+curl -X GET "http://localhost:9999/data/current?filter=plc1/*"
+
+# Restart service
+curl -X POST http://localhost:9999/service/restart
+
+# With authentication
+curl -X GET http://localhost:9999/status \
+  -H "Authorization: Bearer YOUR-API-KEY"</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="api-tools">
+            <div class="container">
+                <h2>API Development Tools</h2>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <h3>📡 Postman Collection</h3>
+                        <p>Pre-configured collection with all DIME API endpoints.</p>
+                        <a href="#" class="btn btn-secondary">Download Collection</a>
+                    </div>
+                    <div class="tool-card">
+                        <h3>📘 OpenAPI Spec</h3>
+                        <p>Complete OpenAPI 3.0 specification for code generation.</p>
+                        <a href="#" class="btn btn-secondary">Download Spec</a>
+                    </div>
+                    <div class="tool-card">
+                        <h3>🧪 API Tester</h3>
+                        <p>Interactive web-based API testing tool.</p>
+                        <a href="#" class="btn btn-secondary">Launch Tester</a>
+                    </div>
+                    <div class="tool-card">
+                        <h3>📚 SDK Libraries</h3>
+                        <p>Official SDKs for Python, JavaScript, and .NET.</p>
+                        <a href="#" class="btn btn-secondary">View SDKs</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DIME Platform</h4>
+                    <ul>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="documentation.html">Documentation</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="docs-connectors.html">Connector Reference</a></li>
+                        <li><a href="docs-configuration.html">Configuration Guide</a></li>
+                        <li><a href="docs-api.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">GitHub Repository</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About MRIIOT</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Partners</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 MRIIOT LLC. All rights reserved. | DIME - Data In Motion Enterprise</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function showExample(language) {
+            // Hide all examples
+            const examples = document.querySelectorAll('.example-content');
+            examples.forEach(ex => ex.classList.remove('active'));
+            
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.example-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected example
+            document.getElementById(language + '-example').classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
